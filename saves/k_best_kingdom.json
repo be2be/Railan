@@ -1,0 +1,39 @@
+{
+    "Name":"Best Kingdom",
+    "Villages": [
+        {
+            "Name":"Füchtorf",
+            "NumCitizen": 123
+        },
+        {
+            "Name":"Sassenberg",
+            "NumCitizen": 321
+        }
+    ],
+    "Crafts": {
+        "Woodworker": [
+            {
+                "CraftType": "Woodworker",
+                "Lvl": 1
+            },
+            {
+                "CraftType": "Woodworker",
+                "Lvl": 23
+            },
+            {
+                "CraftType": "Woodworker",
+                "Lvl": 25
+            }
+        ],
+        "Stonemason": [
+            {
+                "CraftType": "Stonemason",
+                "Lvl": 13
+            },
+            {
+                "CraftType": "Stonemason",
+                "Lvl": 4
+            }
+        ]
+    }
+}

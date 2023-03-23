@@ -1,0 +1,4 @@
+[V]illages
+[C]rafts
+[D]iplomacy
+[Q]uit
