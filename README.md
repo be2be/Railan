@@ -6,7 +6,6 @@ The app itself is rendering homage to a personal game of my youth. One of those 
 The current version contains the very core of the app consisting of a thread running a tui terminal, another running is crossterm event listener and a third running a game-loop. You can start the game, access different menues and quit it. 
 
 The next steps will include:
-- In the UI, provide a scrolling mechanism.
 - Allow players to rename villages and add descriptions.
 - Add a main menu, which allows starting a new game and loading save files.
 - Finally, start implementing the game's core village/craft functionality.
