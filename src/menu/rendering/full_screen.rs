@@ -58,4 +58,12 @@ impl TerminalRenderer for FullScreenMessage {
             thread::sleep(Duration::from_secs(3));
         }
     }
+
+    fn set_scroll_offset(&mut self, _offset: u16) {
+        // nothing to do
+    }
+
+    fn get_scroll_offset(&self) -> u16 {
+        0
+    }
 }

@@ -39,4 +39,12 @@ impl TerminalRenderer for MainMenu{
             f.render_widget(main.clone(), chunks[1]);
         }).expect("Can render widget");
     }
+
+    fn set_scroll_offset(&mut self, _offset: u16) {
+        // nothing to do
+    }
+
+    fn get_scroll_offset(&self) -> u16 {
+        0
+    }
 }

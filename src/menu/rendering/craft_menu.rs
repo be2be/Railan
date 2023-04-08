@@ -13,7 +13,19 @@ use crate::game::GameState;
 use crate::menu::rendering::TerminalRenderer;
 
 /// A view, which displays a player's crafts
-pub  struct CraftMenu;
+pub struct CraftMenu{
+    /// The scrolling offset in case of bigger menues
+    scroll_offset: u16,
+}
+
+impl CraftMenu{
+    /// Initialize CraftMenu with a scrolling offset of 0
+    pub fn new() -> CraftMenu{
+        CraftMenu{
+            scroll_offset: 0,
+        }
+    }
+}
 
 impl TerminalRenderer for CraftMenu{
 
@@ -40,11 +52,20 @@ impl TerminalRenderer for CraftMenu{
             let craft_screen = Paragraph::new(crafts)
                 .style(main_style)
                 .alignment(Alignment::Center)
+                .scroll((self.get_scroll_offset(),0))
                 .block(Block::default().borders(Borders::ALL).title("Main"));
 
             f.render_widget(craft_screen, chunks[1]);
 
             f.render_widget(menu_widget.clone(), chunks[0]);
         }).expect("Can render widget");
+    }
+
+    fn set_scroll_offset(&mut self, offset: u16) {
+        self.scroll_offset = offset;
+    }
+
+    fn get_scroll_offset(&self) -> u16 {
+        self.scroll_offset
     }
 }

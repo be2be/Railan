@@ -13,7 +13,19 @@ use crate::game::GameState;
 use crate::menu::rendering::TerminalRenderer;
 
 /// A view, which displays a player's villages
-pub struct VillageMenu;
+pub struct VillageMenu{
+    /// The scrolling offset in case of bigger menues
+    scroll_offset: u16,
+}
+
+impl VillageMenu{
+    /// Initialize VillageMenu with a scrolling offset of 0
+    pub fn new() -> VillageMenu{
+        VillageMenu{
+            scroll_offset: 0,
+        }
+    }
+}
 
 impl TerminalRenderer for VillageMenu{
 
@@ -35,11 +47,20 @@ impl TerminalRenderer for VillageMenu{
             let village_screen = Paragraph::new(format!("Your villages:\n {}", villages))
                 .style(main_style)
                 .alignment(Alignment::Center)
+                .scroll((self.get_scroll_offset(),0))
                 .block(Block::default().borders(Borders::ALL).title("Main"));
 
             f.render_widget(village_screen, chunks[1]);
 
             f.render_widget(menu_widget.clone(), chunks[0]);
         }).expect("Can render widget");
+    }
+
+    fn set_scroll_offset(&mut self, offset: u16) {
+        self.scroll_offset = offset;
+    }
+
+    fn get_scroll_offset(&self) -> u16 {
+        self.scroll_offset
     }
 }

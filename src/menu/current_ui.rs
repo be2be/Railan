@@ -8,7 +8,7 @@ use tui::Terminal;
 use tui::widgets::List;
 use crate::game::GameState;
 
-use crate::menu::ui_foundations::UIType;
+use crate::menu::ui_foundations::{ScrollingDirection, UIType};
 use crate::menu::rendering::{
     TerminalRenderer,
     full_screen::FullScreenMessage,
@@ -45,9 +45,9 @@ impl CurrentUI{
                 map.insert( UIType::Start, Box::new(FullScreenMessage { ui_type: UIType::Start}));
                 map.insert( UIType::Quit, Box::new( FullScreenMessage { ui_type: UIType::Quit} ));
                 map.insert( UIType::Main, Box::new(MainMenu{}));
-                map.insert( UIType::Villages, Box::new(VillageMenu{}));
-                map.insert( UIType::Crafts, Box::new(CraftMenu{}));
-                map.insert( UIType::Diplomacy, Box::new(DiplomacyMenu{}));
+                map.insert( UIType::Villages, Box::new(VillageMenu::new()));
+                map.insert( UIType::Crafts, Box::new(CraftMenu::new()));
+                map.insert( UIType::Diplomacy, Box::new(DiplomacyMenu::new()));
 
                 map
             },
@@ -71,7 +71,7 @@ impl CurrentUI{
     /// it will add an expiration time of three seconds so that the closing message can be displayed
     /// as long.
     /// * `ui_type` is the new ui-type of the current ui
-    pub fn update_current_ui(&mut self, ui_type: UIType){
+    pub fn change_ui_type(&mut self, ui_type: UIType){
         self.ui_type = ui_type;
 
         if self.ui_type == UIType::Quit{
@@ -79,7 +79,34 @@ impl CurrentUI{
         }else{
             self.expiration_time = None;
         }
+        
+        self.reset_scroll_offset();
 
+    }
+
+    /// Increments or decrements the scrolling offset of the current view, depending on its
+    /// scrolling-direction.
+    /// # Arguments
+    /// `direction` - The scrolling direction, either up or down
+    pub fn scroll(&mut self, direction: ScrollingDirection){
+        let mut scroll_offset = self.get_current_ui_renderer_mut().get_scroll_offset();
+
+        match direction{
+            ScrollingDirection::Up => {
+                if scroll_offset > 0{
+                    scroll_offset -= 1
+                }
+            }
+            ScrollingDirection::Down => scroll_offset += 1,
+        }
+
+        self.get_current_ui_renderer_mut().set_scroll_offset(scroll_offset);
+    }
+
+    /// Resets the scroll offset to zero in order to ensure that a menu will be displayed from the
+    /// very top onwards
+    fn reset_scroll_offset(&mut self) {
+        self.get_current_ui_renderer_mut().set_scroll_offset(0);
     }
 
     /// Draws the current ui to the terminal. The rendering is done by a struct, which implements the
@@ -87,9 +114,11 @@ impl CurrentUI{
     /// renderer_for_ui_type.
     pub fn render(&mut self, terminal: &mut Terminal<CrosstermBackend<Stdout>>, menu_widget : &List, game_state: Arc<RwLock<GameState>>) {
 
-        if let Some(renderer) = self.renderer_for_ui_type.get_mut(&self.ui_type){
+        self.get_current_ui_renderer_mut().render(terminal,menu_widget,game_state);
+    }
 
-            renderer.render(terminal,menu_widget,game_state);
-        }
+    /// A helper method to return the TerminalRenderer-trait for the current view
+    fn get_current_ui_renderer_mut(&mut self) -> &mut Box<dyn TerminalRenderer>{
+        self.renderer_for_ui_type.get_mut(&self.ui_type).unwrap()
     }
 }

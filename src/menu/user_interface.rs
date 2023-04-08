@@ -18,7 +18,7 @@ use crate::menu::ui_foundations::*;
 use crate::menu::events::{UIEventBuilder,UIEvent};
 use crate::menu::assets;
 use crate::game::GameState;
-use crate::menu::ui_foundations::ActionType::{ChangeView, HandleUITimeout};
+use crate::menu::ui_foundations::ActionType::{ChangeView, HandleUITimeout, Scroll};
 use crate::menu::current_ui::CurrentUI;
 
 /// Holds the current user-interface the common terminal as well as some general data structures, which
@@ -89,6 +89,20 @@ impl UserInterface {
                     .build()
                     .unwrap();
 
+                let scroll_down = UIEventBuilder::new().input_key_event(Event::Key(KeyEvent {
+                    code: KeyCode::Down,
+                    modifiers: KeyModifiers::NONE,
+                    kind: KeyEventKind::Press,
+                    state: KeyEventState::NONE,
+                })).build().unwrap();
+
+                let scroll_up = UIEventBuilder::new().input_key_event(Event::Key(KeyEvent {
+                    code: KeyCode::Up,
+                    modifiers: KeyModifiers::NONE,
+                    kind: KeyEventKind::Press,
+                    state: KeyEventState::NONE,
+                })).build().unwrap();
+
                 let mut event_to_action_type  = HashMap::new();
                 event_to_action_type.insert(village_menu_event, ChangeView(UIType::Villages));
                 event_to_action_type.insert(craft_menu_event, ChangeView(UIType::Crafts));
@@ -96,6 +110,8 @@ impl UserInterface {
                 event_to_action_type.insert(quit_event, ChangeView(UIType::Quit));
                 event_to_action_type.insert(timeout_start, HandleUITimeout(UIType::Start));
                 event_to_action_type.insert(timeout_quit, HandleUITimeout(UIType::Quit));
+                event_to_action_type.insert(scroll_down, Scroll(ScrollingDirection::Down));
+                event_to_action_type.insert(scroll_up, Scroll(ScrollingDirection::Up));
 
                 event_to_action_type
             }
@@ -166,22 +182,26 @@ impl UserInterface {
         if let Some(action_for_event) = self.get_action_for_event(&event){
 
             match action_for_event{
+
+                Scroll(scroll_direction) => {
+                    self.cur_ui.scroll(*scroll_direction);
+                }
                 ChangeView(ui_type) => {
 
                     if self.get_current_uitype() == *ui_type {
-                        self.cur_ui.update_current_ui(UIType::Main)
+                        self.cur_ui.change_ui_type(UIType::Main)
                     } else{
-                        self.cur_ui.update_current_ui(*ui_type);
+                        self.cur_ui.change_ui_type(*ui_type);
                     }
                 }
                 HandleUITimeout(ui_type) => {
 
                     match ui_type {
                         UIType::Start => {
-                            self.cur_ui.update_current_ui(UIType::Main)
+                            self.cur_ui.change_ui_type(UIType::Main)
                         },
                         UIType::Quit => {
-                            self.cur_ui.update_current_ui(UIType::Terminated)
+                            self.cur_ui.change_ui_type(UIType::Terminated)
                         },
                         _ => {}
                     }
